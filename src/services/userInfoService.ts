@@ -29,17 +29,3 @@ export const saveUserInfo = (data: any) => {
         }
     });
 };
-
-export const marketingEmails = (data: { allow: boolean }) => {
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-        throw new Error('No authentication token found. Please log in.');
-    }
-    return axios.post(`/api/user-info/marketing`, data, {
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
-    });
-};

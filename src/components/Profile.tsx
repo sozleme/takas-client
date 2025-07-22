@@ -8,13 +8,18 @@ import {
     FormControlLabel,
     Checkbox,
     Grid,
-    Paper,
+    Paper, FormControl, InputLabel, MenuItem, Select,
 } from '@mui/material';
 import DashboardLayout from './DashboardLayout';
 import {changePassword} from "../services/authService";
 import {useSnackbar} from "notistack";
-import {marketingEmails} from "../services/userService";
 import {getUserInfo, saveUserInfo} from "../services/userInfoService";
+import {getCountries} from "../services/countryService";
+
+interface Country {
+    id: number;
+    name: string;
+}
 
 const Profile: React.FC = () => {
     const { enqueueSnackbar } = useSnackbar();
@@ -28,6 +33,7 @@ const Profile: React.FC = () => {
         city: '',
         country: '',
         phone: '',
+        allowMarketingEmails: true,
     });
 
     const [passwordInfo, setPasswordInfo] = useState({
@@ -36,7 +42,25 @@ const Profile: React.FC = () => {
         confirmPassword: '',
     });
 
-    const [marketingConsent, setMarketingConsent] = useState(true);
+    const [countries, setCountries] = useState<Country[]>([]);
+
+    useEffect(() => {
+        const fetchCountries = async () => {
+            try {
+                const countries = await getCountries();
+                if (countries.data) {
+                    setCountries(countries.data);
+                } else {
+                    enqueueSnackbar('Failed to fetch countries', { variant: 'error' });
+                }
+            } catch (err) {
+                enqueueSnackbar('Error fetching countries', { variant: 'error' });
+                console.error('Error fetching countries:', err);
+            }
+        };
+
+        fetchCountries().then();
+    }, [enqueueSnackbar]);
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -51,21 +75,27 @@ const Profile: React.FC = () => {
                         address: data.address,
                         postalCode: data.postalCode,
                         city: data.city,
-                        country: data.country?.name || '',
-                        phone: '',
+                        country: data.country?.id || '',
+                        phone: data.phone,
+                        allowMarketingEmails: data.allowMarketingEmails,
                     });
-                    setMarketingConsent(data.allowMarketingEmails);
                 }
             } catch (err: any) {
-                enqueueSnackbar("Kullanıcı bilgileri alınamadı", { variant: 'error' });
+                if (err.errorCode !== 404) {
+                    enqueueSnackbar(err.response.data.message, {variant: 'error'});
+                }
             }
         };
 
         fetchUserInfo().then();
-    }, []);
+    }, [enqueueSnackbar]);
 
     const handleUserInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setUserInfo({ ...userInfo, [e.target.name]: e.target.value });
+    };
+
+    const handleCountryChange = (e: any) => {
+        setUserInfo({ ...userInfo, country: e.target.value });
     };
 
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,20 +127,6 @@ const Profile: React.FC = () => {
         }
     };
 
-    const handleMarketingEmails = async (isChecked: boolean) => {
-        setMarketingConsent(isChecked);
-        try {
-            const response = await marketingEmails({
-                allow: isChecked,
-            });
-            if (response.status === 200) {
-                enqueueSnackbar(response.data.message, {variant: 'success'});
-            }
-        } catch (err : any) {
-            enqueueSnackbar(err?.response?.data?.message || err.message || 'Unexpected error.', { variant: 'error' });
-        }
-    }
-
     const handleSaveUserInfo = async () => {
         try {
             const response = await saveUserInfo({
@@ -120,8 +136,9 @@ const Profile: React.FC = () => {
                 address: userInfo.address,
                 postalCode: parseInt(userInfo.postalCode),
                 city: userInfo.city,
-                countryId: 1, // Henüz countryId manuel, backend'den mapping gerekebilir
-                allowMarketingEmails: marketingConsent,
+                countryId: parseInt(userInfo.country),
+                phone: userInfo.phone,
+                allowMarketingEmails: userInfo.allowMarketingEmails,
             });
 
             if (response.status === 200) {
@@ -141,6 +158,7 @@ const Profile: React.FC = () => {
 
             <Paper sx={{ p: 3, mb: 4 }}>
                 <Typography variant="h6" gutterBottom>User Information</Typography>
+                <Divider sx={{ my: 2 }} />
                 <Grid container spacing={2}>
                         <TextField
                             label="First Name"
@@ -196,14 +214,21 @@ const Profile: React.FC = () => {
                             fullWidth
                             size={"small"}
                         />
-                        <TextField
-                            label="Country"
-                            name="country"
-                            value={userInfo.country}
-                            onChange={handleUserInfoChange}
-                            fullWidth
-                            size={"small"}
-                        />
+                        <FormControl fullWidth size="small">
+                            <InputLabel>Country</InputLabel>
+                            <Select
+                                name="countryId"
+                                value={userInfo.country}
+                                label="Country"
+                                onChange={handleCountryChange}
+                            >
+                                {countries.map((country) => (
+                                    <MenuItem key={country.id} value={country.id}>
+                                        {country.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                         <TextField
                             label="Mobile Phone"
                             name="phone"
@@ -211,6 +236,15 @@ const Profile: React.FC = () => {
                             onChange={handleUserInfoChange}
                             fullWidth
                             size={"small"}
+                        />
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={userInfo.allowMarketingEmails}
+                                    onChange={(e) => setUserInfo({ ...userInfo, allowMarketingEmails: e.target.checked })}
+                                />
+                            }
+                            label="Allow marketing emails"
                         />
                 </Grid>
                 <Box sx={{ mt: 2 }}>
@@ -220,6 +254,7 @@ const Profile: React.FC = () => {
 
             <Paper sx={{ p: 3, mb: 4 }}>
                 <Typography variant="h6" gutterBottom>Change Password</Typography>
+                <Divider sx={{ my: 2 }} />
                 <Grid container spacing={2}>
                         <TextField
                             label="Current Password"
@@ -256,15 +291,6 @@ const Profile: React.FC = () => {
 
             <Paper sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom>Manage Membership</Typography>
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={marketingConsent}
-                            onChange={(e) => handleMarketingEmails(e.target.checked)}
-                        />
-                    }
-                    label="Allow marketing emails"
-                />
                 <Divider sx={{ my: 2 }} />
                 <Button
                     variant="outlined"
