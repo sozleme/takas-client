@@ -8,9 +8,13 @@ import {
     IconButton,
     Fade,
 } from '@mui/material';
-import { ChevronLeft, ChevronRight } from '@mui/icons-material';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import {
+    ChevronLeft,
+    ChevronRight,
+    LocationOn,
+    Favorite as FavoriteIcon,
+    FavoriteBorder as FavoriteBorderIcon
+} from '@mui/icons-material';
 
 interface ListingCardProps {
     title?: string;
@@ -19,20 +23,26 @@ interface ListingCardProps {
     height?: number;
     width?: string | number;
     isFavorite: boolean;
+    category?: string;
+    place?: string;
+    distance?: string;
     children?: React.ReactNode;
     onClick?: () => void;
 }
 
 const ListingCard: React.FC<ListingCardProps> = ({
-                                                       title,
-                                                       description,
-                                                       images,
-                                                       height = 200,
-                                                       width = '100%',
-                                                       isFavorite = false,
-                                                       children,
-                                                       onClick,
-                                                   }) => {
+    title,
+    description,
+    images,
+    height = 200,
+    width = '100%',
+    isFavorite = false,
+    category,
+    place,
+    distance,
+    children,
+    onClick,
+   }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const handlePrevImage = (e: React.MouseEvent) => {
@@ -73,7 +83,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                         No Image Available
                     </Typography>
                 </Box>
-                {(title || description || children) && (
+                {(title || description || category || place || distance || children) && (
                     <CardContent>
                         {title && (
                             <Typography variant="h6" component="h2" gutterBottom>
@@ -208,11 +218,16 @@ const ListingCard: React.FC<ListingCardProps> = ({
             </Box>
 
             {/* Card content */}
-            {(title || description || children) && (
+            {(title || description || category || place || distance || children) && (
                 <CardContent>
                     {title && (
-                        <Typography variant="h6" component="h2" gutterBottom>
+                        <Typography variant="h6" component="h2">
                             {title}
+                        </Typography>
+                    )}
+                    {category && (
+                        <Typography variant="caption" component="p" gutterBottom>
+                            {category}
                         </Typography>
                     )}
                     {description && (
@@ -226,27 +241,40 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
             <Box sx={{
                 display: 'flex',
-                justifyContent: 'flex-end',
-                alignItems: 'flex-end',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                px: 2,
+                pb: 2,
                 minHeight: 40,
-                mt: 1
             }}>
-                {
-                    isFavorite ?
+                {distance && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <LocationOn sx={{ fontSize: 16, color: 'text.secondary' }} />
+                        <Typography variant="body2" color="text.secondary">
+                            {distance}
+                        </Typography>
+                    </Box>
+                )}
+
+                <Box>
+                    {isFavorite ? (
                         <FavoriteBorderIcon
-                            sx={{ mt: 5, mr:1, mb: 1, color: 'red', cursor: 'pointer' }}
+                            sx={{ color: 'red', cursor: 'pointer' }}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 alert('Added as favorite!');
-                            }}/> :
+                            }}
+                        />
+                    ) : (
                         <FavoriteIcon
-                            sx={{ mt: 5, mr:1, mb: 1, color: 'red', cursor: 'pointer' }}
+                            sx={{ color: 'red', cursor: 'pointer' }}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 alert('Removed from favorite!');
-                            }}/>
-                }
-
+                            }}
+                        />
+                    )}
+                </Box>
             </Box>
         </Card>
     );

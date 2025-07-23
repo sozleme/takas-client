@@ -21,40 +21,81 @@ const Dashboard : React.FC = () => {
         <Box sx={{ p: 1 }}>
             <Grid container spacing={3} alignContent={'center'}>
                 <ListingCard
-                    title="Compact Gallery"
+                    title="Asus Computer"
+                    description={'Asus Computer description text'}
+                    category={'Electronics'}
+                    distance={'1 km'}
                     images={multipleImages}
-                    height={100}
-                    width={200}
+                    height={240}
+                    width={180}
                     isFavorite={true}
                     onClick={() => handleCardClick('Beautiful Landscapes')}
                 />
                 <ListingCard
-                    title="Compact Gallery"
+                    title="Asus Computer"
+                    description={'Asus Computer description text'}
+                    category={'Electronics'}
+                    distance={'1 km'}
                     images={multipleImages}
-                    height={100}
-                    width={200}
-                    isFavorite={false}
-                />
-                <ListingCard
-                    title="Compact Gallery"
-                    images={multipleImages}
-                    height={100}
-                    width={200}
+                    height={240}
+                    width={180}
                     isFavorite={true}
+                    onClick={() => handleCardClick('Beautiful Landscapes')}
                 />
                 <ListingCard
-                    title="Compact Gallery"
+                    title="Asus Computer"
+                    description={'Asus Computer description text'}
+                    category={'Electronics'}
+                    distance={'1 km'}
                     images={multipleImages}
-                    height={100}
-                    width={200}
-                    isFavorite={false}
-                />
-                <ListingCard
-                    title="Compact Gallery"
-                    images={multipleImages}
-                    height={100}
-                    width={200}
+                    height={240}
+                    width={180}
                     isFavorite={true}
+                    onClick={() => handleCardClick('Beautiful Landscapes')}
+                />
+                <ListingCard
+                    title="Asus Computer"
+                    description={'Asus Computer description text'}
+                    category={'Electronics'}
+                    distance={'1 km'}
+                    images={multipleImages}
+                    height={240}
+                    width={180}
+                    isFavorite={true}
+                    onClick={() => handleCardClick('Beautiful Landscapes')}
+                />
+                <ListingCard
+                    title="Asus Computer"
+                    description={'Asus Computer description text'}
+                    category={'Electronics'}
+                    distance={'1 km'}
+                    images={multipleImages}
+                    height={240}
+                    width={180}
+                    isFavorite={true}
+                    onClick={() => handleCardClick('Beautiful Landscapes')}
+                />
+                <ListingCard
+                    title="Asus Computer"
+                    description={'Asus Computer description text'}
+                    category={'Electronics'}
+                    distance={'1 km'}
+                    images={multipleImages}
+                    height={240}
+                    width={180}
+                    isFavorite={true}
+                    onClick={() => handleCardClick('Beautiful Landscapes')}
+                />
+                <ListingCard
+                    title="Asus Computer"
+                    description={'Asus Computer description text'}
+                    category={'Electronics'}
+                    distance={'1 km'}
+                    images={multipleImages}
+                    height={240}
+                    width={180}
+                    isFavorite={true}
+                    onClick={() => handleCardClick('Beautiful Landscapes')}
                 />
             </Grid>
         </Box>
